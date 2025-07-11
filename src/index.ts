@@ -134,7 +134,7 @@ async function generateCSVForAllPlayers(
   console.log("\nGenerating CSV for all players...");
 
   const csvRows: string[] = [];
-  const headers = ["username", "rating_30_days_ago"];
+  const headers = ["username"];
 
   // Add date headers for each day (30 days ago to today)
   for (let i = 29; i >= 0; i--) {
@@ -170,22 +170,19 @@ async function generateCSVForAllPlayers(
 
       const row = [player.username];
 
-      // Rating 30 days ago (or current if no data)
+      // Get current rating as fallback
       const currentRating = player.perfs.classical.rating;
-      const oldestRating =
-        recentPoints.length > 0 ? recentPoints[0][3] : currentRating; // rating is at index 3
-      const ratingToUse = oldestRating || currentRating || 1500; // Default rating if none found
-      row.push(ratingToUse.toString());
+      const fallbackRating = currentRating || 1500; // Default rating if none found
 
       // TODO: 🔥 CRITICAL - fix date alignment algorithm (currently broken)
       // ** [critical] implement proper daily rating interpolation
       // ** [important] handle missing data points with forward/backward fill
       // ** [critical] align ratings to actual calendar dates, not just indices
       for (let i = 0; i < 30; i++) {
-        const pointIndex = Math.floor((i / 30) * recentPoints.length);
+        const pointIndex = Math.floor((i / 29) * (recentPoints.length - 1));
         const rating = recentPoints[pointIndex]
           ? recentPoints[pointIndex][3] // rating is at index 3
-          : ratingToUse;
+          : fallbackRating;
         row.push(rating.toString());
       }
 
@@ -198,12 +195,29 @@ async function generateCSVForAllPlayers(
     }
   }
 
-  // TODO: implement file output
-  // ** [important] write CSV to file using fs.writeFile with proper error handling
-  // ** [enhancement] add configurable output path (CLI argument or env var)
-  // ** [nice-to-have] add timestamp in filename for multiple runs
-  console.log("\nCSV Output:");
-  csvRows.forEach((row) => console.log(row));
+  // Write CSV to dist folder with timestamp
+  const fs = require('fs');
+  const path = require('path');
+  
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const distDir = 'dist';
+  const filename = `chess-ratings-${timestamp}.csv`;
+  const filepath = path.join(distDir, filename);
+  
+  try {
+    // Create dist directory if it doesn't exist
+    if (!fs.existsSync(distDir)) {
+      fs.mkdirSync(distDir, { recursive: true });
+    }
+    
+    fs.writeFileSync(filepath, csvRows.join('\n'), 'utf8');
+    console.log(`\nCSV written to: ${filepath}`);
+    console.log(`Processed ${csvRows.length - 1} players successfully`);
+  } catch (error) {
+    console.error('Failed to write CSV file:', error);
+    console.log("\nFallback - CSV Output:");
+    csvRows.forEach((row) => console.log(row));
+  }
 }
 
 async function main() {
