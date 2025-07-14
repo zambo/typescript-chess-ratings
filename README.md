@@ -155,7 +155,3 @@ The pre-commit hooks will automatically run linting and formatting checks.
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
-
----
-
-_A high-performance TypeScript application for chess analytics._
