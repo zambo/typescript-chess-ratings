@@ -95,11 +95,11 @@ The application generates CSV files in the `dist/` folder with the format:
 - **Jest**: Testing framework with coverage reports
 - **ts-jest**: TypeScript support for Jest
 
-### CI/CD
+### Development Workflow
 
-- **GitHub Actions**: Automated testing, linting, and building
-- Multi-Node.js version testing (18.x, 20.x, 22.x)
-- Security auditing and dependency checks
+- **Local Testing**: Complete test suite with Jest
+- **Quality Assurance**: Pre-commit hooks ensure code quality
+- **Type Safety**: Comprehensive TypeScript checking
 
 ## Technical Improvements
 
