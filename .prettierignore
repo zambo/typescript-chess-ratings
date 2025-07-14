@@ -1,0 +1,10 @@
+dist/
+node_modules/
+*.log
+*.lock
+.env
+.env.local
+.env.*.local
+coverage/
+*.config.js
+*.config.ts
